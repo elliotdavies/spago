@@ -64,27 +64,22 @@ outputShouldEqual expected (_,output,_) = do
 shouldBeSuccessOutput :: HasCallStack => FilePath -> (ExitCode, Text, Text) -> IO ()
 shouldBeSuccessOutput expected (code, stdout, _stderr) = do
   expectedStdout <- readFixture expected
-  code `shouldBe` ExitSuccess
-  stdout `shouldBe` expectedStdout
+  (code, stdout) `shouldBe` (ExitSuccess, expectedStdout)
 
 shouldBeSuccessStderr :: HasCallStack => FilePath -> (ExitCode, Text, Text) -> IO ()
 shouldBeSuccessStderr expected (code, _stdout, stderr) = do
   expectedStderr <- readFixture expected
-  code `shouldBe` ExitSuccess
-  stderr `shouldBe` expectedStderr
+  (code, stderr) `shouldBe` (ExitSuccess, expectedStderr)
 
 shouldBeSuccessOutputWithErr :: HasCallStack => FilePath -> FilePath -> (ExitCode, Text, Text) -> IO ()
 shouldBeSuccessOutputWithErr expected expectedErr (code, stdout, stderr) = do
   expectedStdout <- readFixture expected
   expectedStderr <- readFixture expectedErr
-  code `shouldBe` ExitSuccess
-  stdout `shouldBe` expectedStdout
-  stderr `shouldBe` expectedStderr
+  (code, stdout, stderr) `shouldBe` (ExitSuccess, expectedStdout, expectedStderr)
 
 shouldBeSuccessInfix :: HasCallStack => Text -> (ExitCode, Text, Text) -> IO ()
-shouldBeSuccessInfix expected (code, stdout, _stderr) = do
-  code `shouldBe` ExitSuccess
-  stdout `shouldSatisfy` (Text.isInfixOf expected)
+shouldBeSuccessInfix expected result = do
+  result `shouldSatisfy` (\(code, stdout, _stderr) -> code == ExitSuccess && Text.isInfixOf expected stdout)
 
 shouldBeEmptySuccess :: HasCallStack => (ExitCode, Text, Text) -> IO ()
 shouldBeEmptySuccess result = do
@@ -99,14 +94,12 @@ shouldBeFailure result@(_code, _stdout, _stderr) = do
 shouldBeFailureOutput :: HasCallStack => FilePath -> (ExitCode, Text, Text) -> IO ()
 shouldBeFailureOutput expected (code, _stdout, stderr) = do
   expectedContent <- readFixture expected
-  code `shouldBe` ExitFailure 1
-  stderr `shouldBe` expectedContent
+  (code, stderr) `shouldBe` (ExitFailure 1, expectedContent)
 
 shouldBeFailureStderr :: HasCallStack => FilePath -> (ExitCode, Text, Text) -> IO ()
 shouldBeFailureStderr expected (code, _stdout, stderr) = do
   expectedContent <- readFixture expected
-  code `shouldBe` ExitFailure 1
-  stderr `shouldBe` expectedContent
+  (code, stderr) `shouldBe` (ExitFailure 1, expectedContent)
 
 shouldBeFailureInfix :: HasCallStack => Text -> (ExitCode, Text, Text) -> IO ()
 shouldBeFailureInfix expected result = do
